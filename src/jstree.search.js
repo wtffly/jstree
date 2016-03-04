@@ -155,10 +155,17 @@
 			}
 			if(!skip_async && a !== false) {
 				if($.isFunction(a)) {
-					return a.call(this, str, $.proxy(function (d) {
+					return a.call(this, str, $.proxy(function (d, strs) {
 							if(d && d.d) { d = d.d; }
 							this._load_nodes(!$.isArray(d) ? [] : $.vakata.array_unique(d), function () {
-								this.search(str, true, show_only_matches, inside, append);
+								// awake: 对此处进行改造：对多个关键字进行搜索, 从第二个开始append为真。
+							    if (strs && $.isArray(strs)) {
+							        for (var kk = 0; kk < strs.length; kk++) {
+							            this.search(strs[kk], true, show_only_matches, inside, kk == 0 ? append : true);
+							        }
+							    } else {
+							        this.search(str, true, show_only_matches, inside, append);
+							    }
 							}, true);
 						}, this), inside);
 				}
@@ -194,7 +201,10 @@
 			f = new $.vakata.search(str, true, { caseSensitive : s.case_sensitive, fuzzy : s.fuzzy });
 			$.each(m[inside ? inside : $.jstree.root].children_d, function (ii, i) {
 				var v = m[i];
-				if(v.text && (!s.search_leaves_only || (v.state.loaded && v.children.length === 0)) && ( (s.search_callback && s.search_callback.call(this, str, v)) || (!s.search_callback && f.search(v.text).isMatch) ) ) {
+				if(v.text && (!s.search_leaves_only || (v.state.loaded && v.children.length === 0)) && ( (s.search_callback && s.search_callback.call(this, str, v)) || (!s.search_callback && f.search(v.text).isMatch
+                // awake:  添加搜索 "attr" 属性。
+                    || (v.li_attr && v.li_attr.title && f.search(v.li_attr.title).isMatch)
+                    ) ) ) {
 					r.push(i);
 					p = p.concat(v.parents);
 				}

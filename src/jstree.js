@@ -662,9 +662,10 @@
 								o = this.get_next_dom(e.currentTarget);
 								if(o && o.length) { o.children('.jstree-anchor').focus(); }
 								break;
-							case 106: // aria defines * on numpad as open_all - not very common
-								this.open_all();
-								break;
+                            //  awake: 2015-11-23 星号键会打开全部节点。
+							//  case 106: // aria defines * on numpad as open_all - not very common
+							//	this.open_all();
+							//	break;
 							case 36: // home
 								e.preventDefault();
 								o = this._firstChild(this.get_container_ul()[0]);
@@ -2921,8 +2922,9 @@
 			for(i in m) {
 				if(m.hasOwnProperty(i) && i !== $.jstree.root && !m[i].state.hidden) {
 					m[i].state.hidden = true;
-					ids.push(i);
 				}
+                // awake: 已隐藏的还是需要加入列表。
+                ids.push(i);
 			}
 			this._model.force_full_redraw = true;
 			if(!skip_redraw) {
